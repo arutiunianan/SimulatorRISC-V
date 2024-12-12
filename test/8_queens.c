@@ -1,4 +1,4 @@
-#define BOARD_SIZE 27
+#define BOARD_SIZE 20
 
 int isSafe(int board[BOARD_SIZE][BOARD_SIZE], int row, int col)
 {

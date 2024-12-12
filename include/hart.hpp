@@ -16,14 +16,14 @@
 // Cells
 //--------------------------------------------------------------------------
 // Cell connecting fetch and decode stages
-struct fd_cell {
+struct fetch_cell {
     uint32_t inst = 0;
     uint64_t addr = 0;
 };
 
 // Cell connecting decode and execute stages
-struct de_cell {
-    Inst* inst = nullptr;
+struct decode_cell {
+    InstType inst_type = InstType::NONE;
 };
 
 //--------------------------------------------------------------------------
@@ -42,14 +42,10 @@ private:
 
 // Pipeline stages
     void fetch ();
-    fd_cell fd;
+    fetch_cell f_cell;
     void decode ();
-    de_cell de;
-    void execute (bool trace);
-
-// Auxiliary functions for inserting bubbles
-    friend void set_nop_fd_cell (Hart& hart);
-    friend void set_nop_de_cell (Hart& hart);
+    decode_cell d_cell;
+    void execute ();
 
 public:
 // Function that terminates running of pipeline
@@ -70,7 +66,7 @@ public:
     inline uint64_t get_pc_val () { return pc.get_val (); }
 
 // Main pipeline cycle
-    void run_pipeline (bool trace);
+    void run_pipeline ();
 
     void dump ();
 };

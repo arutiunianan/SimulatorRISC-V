@@ -9,14 +9,6 @@
 //--------------------------------------------------------------------------
 class Decoder {
 private:
-// Tmp insts, that are returned by decode_inst()
-    Inst_R tmp_inst_R;
-    Inst_I tmp_inst_I;
-    Inst_S tmp_inst_S;
-    Inst_B tmp_inst_B;
-    Inst_U tmp_inst_U;
-    Inst_J tmp_inst_J;
-
 // Auxiliary functions
     uint32_t decode_imm_I  (uint32_t inst);
     uint32_t decode_imm_S  (uint32_t inst);
@@ -32,7 +24,15 @@ private:
 
 // Core functions
     InstType recognize_inst (uint32_t inst);
-public:
-    Inst* decode_inst (uint32_t inst);
 
+public:
+// Tmp insts, that are returned by decode_inst()
+    Inst_R tmp_inst_R;
+    Inst_I tmp_inst_I;
+    Inst_S tmp_inst_S;
+    Inst_B tmp_inst_B;
+    Inst_U tmp_inst_U;
+    Inst_J tmp_inst_J;
+
+    InstType decode_inst (uint32_t inst);
 };

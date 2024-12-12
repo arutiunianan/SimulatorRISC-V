@@ -53,59 +53,88 @@ void Hart::store_in_memory (uint64_t vaddr, uint64_t val, int store_size) {
 //--------------------------------------------------------------------------
 void Hart::fetch () {
     uint64_t cur_pc_val = pc.get_val();
-    uint32_t cur_inst;
 
-    load_from_memory (pc.get_val(), &cur_inst, WORD_SIZE);
+    load_from_memory (cur_pc_val, &f_cell.inst, WORD_SIZE);
 
-    fd.inst = cur_inst;
-    fd.addr = pc.get_val();
+    f_cell.addr = cur_pc_val;
 
     pc.set_val (cur_pc_val + WORD_SIZE);
 }
 
 void Hart::decode () {
-    uint32_t cur_fd_inst = fd.inst;
-
-    if (!cur_fd_inst)
+    if (!f_cell.inst)
         return;
 
-    Inst* cur_de_inst = decoder.decode_inst (cur_fd_inst);
-    cur_de_inst->addr = fd.addr;
-
-    de.inst = cur_de_inst;
+    d_cell.inst_type = decoder.decode_inst (f_cell.inst);
 }
 
-void Hart::execute (bool trace) {
-    Inst* cur_de_inst = de.inst;
+void Hart::execute () {
+    // // Dump regfile eachtime we enter into or return out of function
+    // if (d_cell.inst_type == InstType::I && decoder.tmp_inst_I.inst_name == InstName::JALR)) {
+    //     regfile.spike_type_dump();
+    //     std::cout << std::endl;
+    // }
 
-    if (!cur_de_inst)
-        return;
-    
-    // Dump regfile eachtime we enter into or return out of function
-    if (trace && (cur_de_inst->name == InstName::JALR)) {
-        regfile.spike_type_dump();
-        std::cout << std::endl;
+    switch (d_cell.inst_type) {
+        case InstType::R:
+            decoder.tmp_inst_R.addr = f_cell.addr;
+            decoder.tmp_inst_R.execute_func(&decoder.tmp_inst_R, *this);
+            break;
+        
+        case InstType::I:
+            decoder.tmp_inst_I.addr = f_cell.addr;
+            decoder.tmp_inst_I.execute_func(&decoder.tmp_inst_I, *this);
+            break;
+        
+        case InstType::S:
+            decoder.tmp_inst_S.addr = f_cell.addr;
+            decoder.tmp_inst_S.execute_func(&decoder.tmp_inst_S, *this);
+            break;
+        
+        case InstType::B:
+            decoder.tmp_inst_B.addr = f_cell.addr;
+            decoder.tmp_inst_B.execute_func(&decoder.tmp_inst_B, *this);
+            break;
+        
+        case InstType::U:
+            decoder.tmp_inst_U.addr = f_cell.addr;
+            decoder.tmp_inst_U.execute_func(&decoder.tmp_inst_U, *this);
+            break;
+        
+        case InstType::J:
+            decoder.tmp_inst_J.addr = f_cell.addr;
+            decoder.tmp_inst_J.execute_func(&decoder.tmp_inst_J, *this);
+            break;
     }
-
-    cur_de_inst->execute_func (cur_de_inst, *this);
-
-    delete cur_de_inst;
 }
 
 //--------------------------------------------------------------------------
 // Main pipeline cycle
 //--------------------------------------------------------------------------
-void Hart::run_pipeline (bool trace) {
+void Hart::run_pipeline () {
     uint64_t num_of_executed_inst = 0;
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
     do {
         set_reg_val (0, 0);
-        
+        // // Fetch
+        // load_from_memory (pc.get_val(), &cur_fetch_inst, WORD_SIZE);
+        // pc.set_val (pc.get_val() + WORD_SIZE);
+
+        // // Decode
+        // cur_dec_inst = decoder.decode_inst (cur_fetch_inst);
+        // cur_dec_inst->addr = pc.get_val() - WORD_SIZE;
+
+        // // Execute
+        // if (!cur_dec_inst)
+        //     exit(-1);
+        // cur_dec_inst->execute_func (cur_dec_inst, *this);
+        // delete cur_dec_inst;
+
         fetch();
         decode();
-        execute (trace);
+        execute();
 
         num_of_executed_inst++;
     } while (!stop);

@@ -7,15 +7,11 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    bool trace = false;
-    if (argc >= 3 && !strcmp(argv[2], "-trace"))
-        trace = true;
-
     Hart hart;
     ELFLoader elfik (argv[1]);
 
     elfik.load (hart);
-    hart.run_pipeline (trace);
+    hart.run_pipeline ();
 
     return 0;
 }
