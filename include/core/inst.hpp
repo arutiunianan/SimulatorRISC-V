@@ -106,12 +106,10 @@ class Inst_I;
 class Inst {
     friend class Decoder;
     friend class Hart;
-    friend Inst_I* create_nop ();
 
 private:
     InstType type = InstType::NONE;
     InstName name = InstName::NONE;
-    Opcode opcode = Opcode::NONE;
     uint64_t addr = 0;
     
     void (*execute_func) (Inst*, Hart&) = nullptr;
@@ -129,10 +127,8 @@ class Inst_R final : public Inst {
     friend class Decoder;
 
 private:
-    uint8_t funct7;
     uint8_t rs2;
     uint8_t rs1;
-    uint8_t funct3;
     uint8_t rd;
 
 public:
@@ -146,12 +142,10 @@ public:
 //--------------------------------------------------------------------------
 class Inst_I final : public Inst {
     friend class Decoder;
-    friend Inst_I* create_nop ();
 
 private:
     uint32_t imm;
     uint8_t  rs1;
-    uint8_t  funct3;
     uint8_t  rd;
 
 public:
@@ -170,7 +164,6 @@ private:
     uint32_t imm;
     uint8_t  rs2;
     uint8_t  rs1;
-    uint8_t  funct3;
 
 public:
     inline uint32_t get_imm () { return imm; }
@@ -188,7 +181,6 @@ private:
     uint32_t imm;
     uint8_t  rs2;
     uint8_t  rs1;
-    uint8_t  funct3;
 
 public:
     inline uint32_t get_imm () { return imm; }

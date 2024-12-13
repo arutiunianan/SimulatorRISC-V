@@ -1,4 +1,5 @@
 #include "stages/decoder.hpp"
+#include "stages/decode_map.hpp"
 #include "stages/executor.hpp"
 
 //--------------------------------------------------------------------------
@@ -56,13 +57,95 @@ inline uint8_t Decoder::decode_opcode (uint32_t inst) {
 }
 
 //--------------------------------------------------------------------------
-// Core functions
+// Decode_inst
 //--------------------------------------------------------------------------
-// Recognize instruction relying on opcode, funct3 and funct7 and set appropriate execute_func
+// Recognize instruction using special maps, relying on opcode, funct3 and 
+// funct7 and set appropriate execute_func
+InstType Decoder::decode_inst_map (uint32_t inst) {
+    uint8_t funct7 = decode_funct7 (inst);
+    uint8_t funct3 = decode_funct3 (inst);
+    uint8_t opcode = decode_opcode (inst);
+
+    InstName inst_name;
+    InstType inst_type;
+
+    funct3_map& f3_m = opc_m [opcode];
+    if (!f3_m.valid)
+        inst_name = f3_m.inst_name;
+    
+    else {
+        funct7_map& f7_m = f3_m.map [funct3];
+        if (!f7_m.valid)
+            inst_name = f7_m.inst_name;
+        
+        else
+            inst_name = f7_m.map [funct7];
+    }
+
+    inst_type = opcode_type_map [opcode];
+
+    switch (inst_type) {
+        case InstType::R:
+            tmp_inst_R.execute_func = name_executor_map [inst_name];
+            tmp_inst_R.type   = InstType::R;
+            tmp_inst_R.rs2    = decode_rs2 (inst);
+            tmp_inst_R.rs1    = decode_rs1 (inst);
+            tmp_inst_R.rd     = decode_rd (inst);
+            break;
+        
+        case InstType::I:
+            tmp_inst_I.execute_func = name_executor_map [inst_name];
+            tmp_inst_I.type   = InstType::I;
+            tmp_inst_I.imm    = decode_imm_I (inst);
+            tmp_inst_I.rs1    = decode_rs1 (inst);
+            tmp_inst_I.rd     = decode_rd (inst);
+            break;
+        
+        case InstType::S:
+            tmp_inst_S.execute_func = name_executor_map [inst_name];
+            tmp_inst_S.type   = InstType::S;
+            tmp_inst_S.imm    = decode_imm_S (inst);
+            tmp_inst_S.rs2    = decode_rs2 (inst);
+            tmp_inst_S.rs1    = decode_rs1 (inst);
+            break;
+        
+        case InstType::B:
+            tmp_inst_B.execute_func = name_executor_map [inst_name];
+            tmp_inst_B.type   = InstType::B;
+            tmp_inst_B.imm    = decode_imm_B (inst);
+            tmp_inst_B.rs2    = decode_rs2 (inst);
+            tmp_inst_B.rs1    = decode_rs1 (inst);
+            break;
+        
+        case InstType::U:
+            tmp_inst_U.execute_func = name_executor_map [inst_name];
+            tmp_inst_U.type   = InstType::U;
+            tmp_inst_U.imm    = decode_imm_U (inst);
+            tmp_inst_U.rd     = decode_rd (inst);
+            break;
+        
+        case InstType::J:
+            tmp_inst_J.execute_func = name_executor_map [inst_name];
+            tmp_inst_J.type   = InstType::J;
+            tmp_inst_J.imm    = decode_imm_J (inst);
+            tmp_inst_J.rd     = decode_rd (inst);
+            break;
+    }
+
+    return inst_type;
+}
+
+//--------------------------------------------------------------------------
+// Decode_inst
+//--------------------------------------------------------------------------
+// Recognize instruction using switch cases, relying on opcode, funct3 and 
+// funct7 and set appropriate execute_func
 InstType Decoder::decode_inst (uint32_t inst) {
     uint8_t funct7 = decode_funct7 (inst);
     uint8_t funct3 = decode_funct3 (inst);
-    Opcode opcode = static_cast<Opcode>(decode_opcode (inst));
+    uint8_t opc = decode_opcode (inst);
+
+    Opcode opcode = static_cast<Opcode>(opc);
     InstType inst_type = InstType::NONE;
 
     switch (opcode) {
@@ -510,51 +593,40 @@ InstType Decoder::decode_inst (uint32_t inst) {
     switch (inst_type) {
         case InstType::R:
             tmp_inst_R.type   = InstType::R;
-            tmp_inst_R.opcode = opcode;
-            tmp_inst_R.funct7 = decode_funct7 (inst);
             tmp_inst_R.rs2    = decode_rs2 (inst);
             tmp_inst_R.rs1    = decode_rs1 (inst);
-            tmp_inst_R.funct3 = decode_funct3 (inst);
             tmp_inst_R.rd     = decode_rd (inst);
             break;
         
         case InstType::I:
             tmp_inst_I.type   = InstType::I;
-            tmp_inst_I.opcode = opcode;
             tmp_inst_I.imm    = decode_imm_I (inst);
             tmp_inst_I.rs1    = decode_rs1 (inst);
-            tmp_inst_I.funct3 = decode_funct3 (inst);
             tmp_inst_I.rd     = decode_rd (inst);
             break;
         
         case InstType::S:
             tmp_inst_S.type   = InstType::S;
-            tmp_inst_S.opcode = opcode;
             tmp_inst_S.imm    = decode_imm_S (inst);
             tmp_inst_S.rs2    = decode_rs2 (inst);
             tmp_inst_S.rs1    = decode_rs1 (inst);
-            tmp_inst_S.funct3 = decode_funct3 (inst);
             break;
         
         case InstType::B:
             tmp_inst_B.type   = InstType::B;
-            tmp_inst_B.opcode = opcode;
             tmp_inst_B.imm    = decode_imm_B (inst);
             tmp_inst_B.rs2    = decode_rs2 (inst);
             tmp_inst_B.rs1    = decode_rs1 (inst);
-            tmp_inst_B.funct3 = decode_funct3 (inst);
             break;
         
         case InstType::U:
             tmp_inst_U.type   = InstType::U;
-            tmp_inst_U.opcode = opcode;
             tmp_inst_U.imm    = decode_imm_U (inst);
             tmp_inst_U.rd     = decode_rd (inst);
             break;
         
         case InstType::J:
             tmp_inst_J.type   = InstType::J;
-            tmp_inst_J.opcode = opcode;
             tmp_inst_J.imm    = decode_imm_J (inst);
             tmp_inst_J.rd     = decode_rd (inst);
             break;

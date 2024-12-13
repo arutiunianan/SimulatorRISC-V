@@ -22,9 +22,6 @@ private:
     uint8_t  decode_rd     (uint32_t inst);
     uint8_t  decode_opcode (uint32_t inst);
 
-// Core functions
-    InstType recognize_inst (uint32_t inst);
-
 public:
 // Tmp insts, that are returned by decode_inst()
     Inst_R tmp_inst_R;
@@ -35,4 +32,5 @@ public:
     Inst_J tmp_inst_J;
 
     InstType decode_inst (uint32_t inst);
+    InstType decode_inst_map (uint32_t inst);
 };

@@ -136,6 +136,8 @@ void Hart::run_pipeline () {
         decode();
         execute();
 
+
+
         num_of_executed_inst++;
     } while (!stop);
 
