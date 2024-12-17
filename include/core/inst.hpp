@@ -106,6 +106,7 @@ class Inst_I;
 class Inst {
     friend class Decoder;
     friend class Hart;
+    friend class BBCache;
 
 private:
     InstType type = InstType::NONE;

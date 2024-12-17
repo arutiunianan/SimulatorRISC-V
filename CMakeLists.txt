@@ -3,12 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 project(simulator)
 
 add_compile_options(
+    -O3
     -flto
-    -Ofast
-    -g
-    -Wall
-    -Wextra
-    -Wpedantic
 )
 
 set(CMAKE_CXX_STANDARD 17)
@@ -27,6 +23,7 @@ link_directories(${ELF_LIBRARY_DIRS})
 file(GLOB SOURCES "${SOURCE_DIR}/*.cpp")
 
 add_executable(simulator ${SOURCES})
+
 target_include_directories(simulator PRIVATE ${INCLUDE_DIR})
 
-target_link_libraries(simulator ${ELF_LIBRARIES})
+target_link_libraries(simulator PRIVATE ${ELF_LIBRARIES})

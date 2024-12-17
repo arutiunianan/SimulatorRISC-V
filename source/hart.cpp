@@ -58,53 +58,90 @@ void Hart::fetch () {
 
     f_cell.addr = cur_pc_val;
 
-    pc.set_val (cur_pc_val + WORD_SIZE);
+    if (flag_new_bb) {
+        bb_start_pc = f_cell.addr;
+    
+        if (bb_cache.in_cache_p (bb_start_pc))
+            flag_execute_from_inst_cache = true;
+        
+        else
+            flag_execute_from_inst_cache = false;
+        
+        flag_new_bb = false;
+    }
 }
 
 void Hart::decode () {
-    if (!f_cell.inst)
+    if (flag_execute_from_inst_cache)
         return;
 
-    d_cell.inst_type = decoder.decode_inst (f_cell.inst);
+    decoder.d_cell.inst_type = decoder.decode_inst (f_cell.inst);
 }
 
 void Hart::execute () {
-    // // Dump regfile eachtime we enter into or return out of function
-    // if (d_cell.inst_type == InstType::I && decoder.tmp_inst_I.inst_name == InstName::JALR)) {
-    //     regfile.spike_type_dump();
-    //     std::cout << std::endl;
-    // }
+    uint64_t cur_pc_val = pc.get_val();
 
-    switch (d_cell.inst_type) {
-        case InstType::R:
-            decoder.tmp_inst_R.addr = f_cell.addr;
-            decoder.tmp_inst_R.execute_func(&decoder.tmp_inst_R, *this);
-            break;
+    if (flag_execute_from_inst_cache) {
+        int bb_size = bb_cache.get_bb_size(bb_start_pc);
         
-        case InstType::I:
-            decoder.tmp_inst_I.addr = f_cell.addr;
-            decoder.tmp_inst_I.execute_func(&decoder.tmp_inst_I, *this);
-            break;
-        
-        case InstType::S:
-            decoder.tmp_inst_S.addr = f_cell.addr;
-            decoder.tmp_inst_S.execute_func(&decoder.tmp_inst_S, *this);
-            break;
-        
-        case InstType::B:
-            decoder.tmp_inst_B.addr = f_cell.addr;
-            decoder.tmp_inst_B.execute_func(&decoder.tmp_inst_B, *this);
-            break;
-        
-        case InstType::U:
-            decoder.tmp_inst_U.addr = f_cell.addr;
-            decoder.tmp_inst_U.execute_func(&decoder.tmp_inst_U, *this);
-            break;
-        
-        case InstType::J:
-            decoder.tmp_inst_J.addr = f_cell.addr;
-            decoder.tmp_inst_J.execute_func(&decoder.tmp_inst_J, *this);
-            break;
+        pc.set_val (cur_pc_val + WORD_SIZE * bb_size);
+        bb_cache.execute_bb (bb_start_pc, *this);
+
+        num_of_executed_inst += bb_cache.get_bb_size(bb_start_pc);
+    }
+    
+    else {
+        pc.set_val (cur_pc_val + WORD_SIZE);
+
+        Inst* new_inst_in_bb;
+
+        switch (decoder.d_cell.inst_type) {
+            case InstType::R:
+                decoder.d_cell.tmp_inst_R.addr = f_cell.addr;
+                decoder.d_cell.tmp_inst_R.execute_func(&decoder.d_cell.tmp_inst_R, *this);
+                new_inst_in_bb = new Inst_R;
+                *static_cast<Inst_R*>(new_inst_in_bb) = decoder.d_cell.tmp_inst_R; 
+                break;
+            
+            case InstType::I:
+                decoder.d_cell.tmp_inst_I.addr = f_cell.addr;
+                decoder.d_cell.tmp_inst_I.execute_func(&decoder.d_cell.tmp_inst_I, *this);
+                new_inst_in_bb = new Inst_I;
+                *static_cast<Inst_I*>(new_inst_in_bb) = decoder.d_cell.tmp_inst_I;  
+                break;
+            
+            case InstType::S:
+                decoder.d_cell.tmp_inst_S.addr = f_cell.addr;
+                decoder.d_cell.tmp_inst_S.execute_func(&decoder.d_cell.tmp_inst_S, *this);
+                new_inst_in_bb = new Inst_S;
+                *static_cast<Inst_S*>(new_inst_in_bb) = decoder.d_cell.tmp_inst_S; 
+                break;
+            
+            case InstType::B:
+                decoder.d_cell.tmp_inst_B.addr = f_cell.addr;
+                decoder.d_cell.tmp_inst_B.execute_func(&decoder.d_cell.tmp_inst_B, *this);
+                new_inst_in_bb = new Inst_B;
+                *static_cast<Inst_B*>(new_inst_in_bb) = decoder.d_cell.tmp_inst_B; 
+                break;
+            
+            case InstType::U:
+                decoder.d_cell.tmp_inst_U.addr = f_cell.addr;
+                decoder.d_cell.tmp_inst_U.execute_func(&decoder.d_cell.tmp_inst_U, *this);
+                new_inst_in_bb = new Inst_U;
+                *static_cast<Inst_U*>(new_inst_in_bb) = decoder.d_cell.tmp_inst_U; 
+                break;
+            
+            case InstType::J:
+                decoder.d_cell.tmp_inst_J.addr = f_cell.addr;
+                decoder.d_cell.tmp_inst_J.execute_func(&decoder.d_cell.tmp_inst_J, *this);
+                new_inst_in_bb = new Inst_J;
+                *static_cast<Inst_J*>(new_inst_in_bb) = decoder.d_cell.tmp_inst_J; 
+                break;
+        }
+
+        bb_cache.add_inst (bb_start_pc, new_inst_in_bb);
+
+        num_of_executed_inst++;
     }
 }
 
@@ -112,33 +149,14 @@ void Hart::execute () {
 // Main pipeline cycle
 //--------------------------------------------------------------------------
 void Hart::run_pipeline () {
-    uint64_t num_of_executed_inst = 0;
-
     auto t_start = std::chrono::high_resolution_clock::now();
 
     do {
         set_reg_val (0, 0);
-        // // Fetch
-        // load_from_memory (pc.get_val(), &cur_fetch_inst, WORD_SIZE);
-        // pc.set_val (pc.get_val() + WORD_SIZE);
-
-        // // Decode
-        // cur_dec_inst = decoder.decode_inst (cur_fetch_inst);
-        // cur_dec_inst->addr = pc.get_val() - WORD_SIZE;
-
-        // // Execute
-        // if (!cur_dec_inst)
-        //     exit(-1);
-        // cur_dec_inst->execute_func (cur_dec_inst, *this);
-        // delete cur_dec_inst;
 
         fetch();
         decode();
         execute();
-
-
-
-        num_of_executed_inst++;
     } while (!stop);
 
     const auto t_end = std::chrono::high_resolution_clock::now();

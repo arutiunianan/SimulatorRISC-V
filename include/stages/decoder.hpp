@@ -7,6 +7,19 @@
 //--------------------------------------------------------------------------
 // Executor
 //--------------------------------------------------------------------------
+// Cell connecting decode and execute stages
+struct decode_cell {
+    InstType inst_type = InstType::NONE;
+
+    // Tmp insts, that are provided to execute stage
+    Inst_R tmp_inst_R;
+    Inst_I tmp_inst_I;
+    Inst_S tmp_inst_S;
+    Inst_B tmp_inst_B;
+    Inst_U tmp_inst_U;
+    Inst_J tmp_inst_J;
+};
+
 class Decoder {
 private:
 // Auxiliary functions
@@ -23,14 +36,8 @@ private:
     uint8_t  decode_opcode (uint32_t inst);
 
 public:
-// Tmp insts, that are returned by decode_inst()
-    Inst_R tmp_inst_R;
-    Inst_I tmp_inst_I;
-    Inst_S tmp_inst_S;
-    Inst_B tmp_inst_B;
-    Inst_U tmp_inst_U;
-    Inst_J tmp_inst_J;
-
+    decode_cell d_cell;
+    
     InstType decode_inst (uint32_t inst);
     InstType decode_inst_map (uint32_t inst);
 };

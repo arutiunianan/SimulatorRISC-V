@@ -6,6 +6,7 @@
 #include "core/regfile.hpp"
 #include "core/segment.hpp"
 #include "core/inst.hpp"
+#include "core/bb_cache.hpp"
 
 #include "utils/constants.hpp"
 
@@ -21,35 +22,39 @@ struct fetch_cell {
     uint64_t addr = 0;
 };
 
-// Cell connecting decode and execute stages
-struct decode_cell {
-    InstType inst_type = InstType::NONE;
-};
-
 //--------------------------------------------------------------------------
 // Hart
 //--------------------------------------------------------------------------
 class Hart final {
 private:
+    bool flag_new_bb = true;
+    bool flag_execute_from_inst_cache = false;
     bool stop = false;
 
+    uint64_t num_of_executed_inst = 0;
+
     uint64_t start_addr;
+    uint64_t bb_start_pc;
 
     Memory memory;
+    BBCache bb_cache;
+    Decoder  decoder;
     Regfile regfile;
     Reg pc;
-    Decoder  decoder;
+
+    fetch_cell f_cell;
 
 // Pipeline stages
     void fetch ();
-    fetch_cell f_cell;
     void decode ();
-    decode_cell d_cell;
     void execute ();
 
 public:
 // Function that terminates running of pipeline
-    void finish () { stop = true; }
+    inline void finish () { stop = true; }
+
+// If we executed jump or branch we need to set flag_new_bb
+    inline void set_flag_new_bb () { flag_new_bb = true; }
 
 // Interaction with memory
     void map_seg_to_VAS (Segment& segment);

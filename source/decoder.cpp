@@ -86,49 +86,49 @@ InstType Decoder::decode_inst_map (uint32_t inst) {
 
     switch (inst_type) {
         case InstType::R:
-            tmp_inst_R.execute_func = name_executor_map [inst_name];
-            tmp_inst_R.type   = InstType::R;
-            tmp_inst_R.rs2    = decode_rs2 (inst);
-            tmp_inst_R.rs1    = decode_rs1 (inst);
-            tmp_inst_R.rd     = decode_rd (inst);
+            d_cell.tmp_inst_R.execute_func = name_executor_map [inst_name];
+            d_cell.tmp_inst_R.type   = InstType::R;
+            d_cell.tmp_inst_R.rs2    = decode_rs2 (inst);
+            d_cell.tmp_inst_R.rs1    = decode_rs1 (inst);
+            d_cell.tmp_inst_R.rd     = decode_rd (inst);
             break;
         
         case InstType::I:
-            tmp_inst_I.execute_func = name_executor_map [inst_name];
-            tmp_inst_I.type   = InstType::I;
-            tmp_inst_I.imm    = decode_imm_I (inst);
-            tmp_inst_I.rs1    = decode_rs1 (inst);
-            tmp_inst_I.rd     = decode_rd (inst);
+            d_cell.tmp_inst_I.execute_func = name_executor_map [inst_name];
+            d_cell.tmp_inst_I.type   = InstType::I;
+            d_cell.tmp_inst_I.imm    = decode_imm_I (inst);
+            d_cell.tmp_inst_I.rs1    = decode_rs1 (inst);
+            d_cell.tmp_inst_I.rd     = decode_rd (inst);
             break;
         
         case InstType::S:
-            tmp_inst_S.execute_func = name_executor_map [inst_name];
-            tmp_inst_S.type   = InstType::S;
-            tmp_inst_S.imm    = decode_imm_S (inst);
-            tmp_inst_S.rs2    = decode_rs2 (inst);
-            tmp_inst_S.rs1    = decode_rs1 (inst);
+            d_cell.tmp_inst_S.execute_func = name_executor_map [inst_name];
+            d_cell.tmp_inst_S.type   = InstType::S;
+            d_cell.tmp_inst_S.imm    = decode_imm_S (inst);
+            d_cell.tmp_inst_S.rs2    = decode_rs2 (inst);
+            d_cell.tmp_inst_S.rs1    = decode_rs1 (inst);
             break;
         
         case InstType::B:
-            tmp_inst_B.execute_func = name_executor_map [inst_name];
-            tmp_inst_B.type   = InstType::B;
-            tmp_inst_B.imm    = decode_imm_B (inst);
-            tmp_inst_B.rs2    = decode_rs2 (inst);
-            tmp_inst_B.rs1    = decode_rs1 (inst);
+            d_cell.tmp_inst_B.execute_func = name_executor_map [inst_name];
+            d_cell.tmp_inst_B.type   = InstType::B;
+            d_cell.tmp_inst_B.imm    = decode_imm_B (inst);
+            d_cell.tmp_inst_B.rs2    = decode_rs2 (inst);
+            d_cell.tmp_inst_B.rs1    = decode_rs1 (inst);
             break;
         
         case InstType::U:
-            tmp_inst_U.execute_func = name_executor_map [inst_name];
-            tmp_inst_U.type   = InstType::U;
-            tmp_inst_U.imm    = decode_imm_U (inst);
-            tmp_inst_U.rd     = decode_rd (inst);
+            d_cell.tmp_inst_U.execute_func = name_executor_map [inst_name];
+            d_cell.tmp_inst_U.type   = InstType::U;
+            d_cell.tmp_inst_U.imm    = decode_imm_U (inst);
+            d_cell.tmp_inst_U.rd     = decode_rd (inst);
             break;
         
         case InstType::J:
-            tmp_inst_J.execute_func = name_executor_map [inst_name];
-            tmp_inst_J.type   = InstType::J;
-            tmp_inst_J.imm    = decode_imm_J (inst);
-            tmp_inst_J.rd     = decode_rd (inst);
+            d_cell.tmp_inst_J.execute_func = name_executor_map [inst_name];
+            d_cell.tmp_inst_J.type   = InstType::J;
+            d_cell.tmp_inst_J.imm    = decode_imm_J (inst);
+            d_cell.tmp_inst_J.rd     = decode_rd (inst);
             break;
     }
 
@@ -150,61 +150,61 @@ InstType Decoder::decode_inst (uint32_t inst) {
 
     switch (opcode) {
         case Opcode::LUI:
-            tmp_inst_U.name = InstName::LUI;
-            tmp_inst_U.execute_func = Executor::execute_LUI;
+            d_cell.tmp_inst_U.name = InstName::LUI;
+            d_cell.tmp_inst_U.execute_func = Executor::execute_LUI;
             inst_type = InstType::U;
             break;
 
         case Opcode::AUIPC:
-            tmp_inst_U.name = InstName::AUIPC;
-            tmp_inst_U.execute_func = Executor::execute_AUIPC;
+            d_cell.tmp_inst_U.name = InstName::AUIPC;
+            d_cell.tmp_inst_U.execute_func = Executor::execute_AUIPC;
             inst_type = InstType::U;
             break;
 
         case Opcode::JAL:
-            tmp_inst_J.name = InstName::JAL;
-            tmp_inst_J.execute_func = Executor::execute_JAL;
+            d_cell.tmp_inst_J.name = InstName::JAL;
+            d_cell.tmp_inst_J.execute_func = Executor::execute_JAL;
             inst_type = InstType::J;
             break;
             
         case Opcode::JALR:
             if (funct3 != 0b000)
                 break;
-            tmp_inst_I.name = InstName::JALR;
-            tmp_inst_I.execute_func = Executor::execute_JALR;
+            d_cell.tmp_inst_I.name = InstName::JALR;
+            d_cell.tmp_inst_I.execute_func = Executor::execute_JALR;
             inst_type = InstType::I;
             break;
 
         case Opcode::BRANCH:
             switch (funct3) {
                 case 0b000:
-                    tmp_inst_B.name = InstName::BEQ;
-                    tmp_inst_B.execute_func = Executor::execute_BEQ;
+                    d_cell.tmp_inst_B.name = InstName::BEQ;
+                    d_cell.tmp_inst_B.execute_func = Executor::execute_BEQ;
                     break;
 
                 case 0b001:
-                    tmp_inst_B.name = InstName::BNE;
-                    tmp_inst_B.execute_func = Executor::execute_BNE;
+                    d_cell.tmp_inst_B.name = InstName::BNE;
+                    d_cell.tmp_inst_B.execute_func = Executor::execute_BNE;
                     break;
 
                 case 0b100:
-                    tmp_inst_B.name = InstName::BLT;
-                    tmp_inst_B.execute_func = Executor::execute_BLT;
+                    d_cell.tmp_inst_B.name = InstName::BLT;
+                    d_cell.tmp_inst_B.execute_func = Executor::execute_BLT;
                     break;
 
                 case 0b101:
-                    tmp_inst_B.name = InstName::BGE;
-                    tmp_inst_B.execute_func = Executor::execute_BGE;
+                    d_cell.tmp_inst_B.name = InstName::BGE;
+                    d_cell.tmp_inst_B.execute_func = Executor::execute_BGE;
                     break;
 
                 case 0b110:
-                    tmp_inst_B.name = InstName::BLTU;
-                    tmp_inst_B.execute_func = Executor::execute_BLTU;
+                    d_cell.tmp_inst_B.name = InstName::BLTU;
+                    d_cell.tmp_inst_B.execute_func = Executor::execute_BLTU;
                     break;
 
                 case 0b111:
-                    tmp_inst_B.name = InstName::BGEU;
-                    tmp_inst_B.execute_func = Executor::execute_BGEU;
+                    d_cell.tmp_inst_B.name = InstName::BGEU;
+                    d_cell.tmp_inst_B.execute_func = Executor::execute_BGEU;
                     break;
 
                 default:
@@ -216,38 +216,38 @@ InstType Decoder::decode_inst (uint32_t inst) {
         case Opcode::LOAD:
             switch (funct3) {
                 case 0b000:
-                    tmp_inst_I.name = InstName::LB;
-                    tmp_inst_I.execute_func = Executor::execute_LB;
+                    d_cell.tmp_inst_I.name = InstName::LB;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_LB;
                     break;
 
                 case 0b001:
-                    tmp_inst_I.name = InstName::LH;
-                    tmp_inst_I.execute_func = Executor::execute_LH;
+                    d_cell.tmp_inst_I.name = InstName::LH;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_LH;
                     break;
 
                 case 0b010:
-                    tmp_inst_I.name = InstName::LW;
-                    tmp_inst_I.execute_func = Executor::execute_LW;
+                    d_cell.tmp_inst_I.name = InstName::LW;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_LW;
                     break;
 
                 case 0b100:
-                    tmp_inst_I.name = InstName::LBU;
-                    tmp_inst_I.execute_func = Executor::execute_LBU;
+                    d_cell.tmp_inst_I.name = InstName::LBU;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_LBU;
                     break;
 
                 case 0b101:
-                    tmp_inst_I.name = InstName::LHU;
-                    tmp_inst_I.execute_func = Executor::execute_LHU;
+                    d_cell.tmp_inst_I.name = InstName::LHU;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_LHU;
                     break;
 
                 case 0b110:
-                    tmp_inst_I.name = InstName::LWU;
-                    tmp_inst_I.execute_func = Executor::execute_LWU;
+                    d_cell.tmp_inst_I.name = InstName::LWU;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_LWU;
                     break;
 
                 case 0b011:
-                    tmp_inst_I.name = InstName::LD;
-                    tmp_inst_I.execute_func = Executor::execute_LD;
+                    d_cell.tmp_inst_I.name = InstName::LD;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_LD;
                     break;
 
                 default:
@@ -259,23 +259,23 @@ InstType Decoder::decode_inst (uint32_t inst) {
         case Opcode::STORE:
             switch (funct3) {
                 case 0b000:
-                    tmp_inst_S.name = InstName::SB;
-                    tmp_inst_S.execute_func = Executor::execute_SB;
+                    d_cell.tmp_inst_S.name = InstName::SB;
+                    d_cell.tmp_inst_S.execute_func = Executor::execute_SB;
                     break;
 
                 case 0b001:
-                    tmp_inst_S.name = InstName::SH;
-                    tmp_inst_S.execute_func = Executor::execute_SH;
+                    d_cell.tmp_inst_S.name = InstName::SH;
+                    d_cell.tmp_inst_S.execute_func = Executor::execute_SH;
                     break;
 
                 case 0b010:
-                    tmp_inst_S.name = InstName::SW;
-                    tmp_inst_S.execute_func = Executor::execute_SW;
+                    d_cell.tmp_inst_S.name = InstName::SW;
+                    d_cell.tmp_inst_S.execute_func = Executor::execute_SW;
                     break;
                 
                 case 0b011:
-                    tmp_inst_S.name = InstName::SD;
-                    tmp_inst_S.execute_func = Executor::execute_SD;
+                    d_cell.tmp_inst_S.name = InstName::SD;
+                    d_cell.tmp_inst_S.execute_func = Executor::execute_SD;
                     break;
 
                 default:
@@ -287,52 +287,52 @@ InstType Decoder::decode_inst (uint32_t inst) {
         case Opcode::OP_IMM:
             switch (funct3) {
                 case 0b000:
-                    tmp_inst_I.name = InstName::ADDI;
-                    tmp_inst_I.execute_func = Executor::execute_ADDI;
+                    d_cell.tmp_inst_I.name = InstName::ADDI;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_ADDI;
                     break;
 
                 case 0b010:
-                    tmp_inst_I.name = InstName::SLTI;
-                    tmp_inst_I.execute_func = Executor::execute_SLTI;
+                    d_cell.tmp_inst_I.name = InstName::SLTI;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_SLTI;
                     break;
 
                 case 0b011:
-                    tmp_inst_I.name = InstName::SLTIU;
-                    tmp_inst_I.execute_func = Executor::execute_SLTIU;
+                    d_cell.tmp_inst_I.name = InstName::SLTIU;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_SLTIU;
                     break;
 
                 case 0b100:
-                    tmp_inst_I.name = InstName::XORI;
-                    tmp_inst_I.execute_func = Executor::execute_XORI;
+                    d_cell.tmp_inst_I.name = InstName::XORI;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_XORI;
                     break;
 
                 case 0b110:
-                    tmp_inst_I.name = InstName::ORI;
-                    tmp_inst_I.execute_func = Executor::execute_ORI;
+                    d_cell.tmp_inst_I.name = InstName::ORI;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_ORI;
                     break;
 
                 case 0b111:
-                    tmp_inst_I.name = InstName::ANDI;
-                    tmp_inst_I.execute_func = Executor::execute_ANDI;
+                    d_cell.tmp_inst_I.name = InstName::ANDI;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_ANDI;
                     break;
                 
                 case 0b001:
                     if (funct7 >> 1 != 0b000000)
                         break;
-                    tmp_inst_I.name = InstName::SLLI;
-                    tmp_inst_I.execute_func = Executor::execute_SLLI;
+                    d_cell.tmp_inst_I.name = InstName::SLLI;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_SLLI;
                     break;
                 
                 case 0b101:
                     switch (funct7 >> 1) {
                         case 0b000000:
-                            tmp_inst_I.name = InstName::SRLI;
-                            tmp_inst_I.execute_func = Executor::execute_SRLI;
+                            d_cell.tmp_inst_I.name = InstName::SRLI;
+                            d_cell.tmp_inst_I.execute_func = Executor::execute_SRLI;
                             break;
 
                         case 0b010000:
-                            tmp_inst_I.name = InstName::SRAI;
-                            tmp_inst_I.execute_func = Executor::execute_SRAI;
+                            d_cell.tmp_inst_I.name = InstName::SRAI;
+                            d_cell.tmp_inst_I.execute_func = Executor::execute_SRAI;
                             break;
 
                         default:
@@ -351,13 +351,13 @@ InstType Decoder::decode_inst (uint32_t inst) {
                 case 0b000:
                     switch (funct7) {
                         case 0b0000000:
-                            tmp_inst_R.name = InstName::ADD;
-                            tmp_inst_R.execute_func = Executor::execute_ADD;
+                            d_cell.tmp_inst_R.name = InstName::ADD;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_ADD;
                             break;
 
                         case 0b0100000:
-                            tmp_inst_R.name = InstName::SUB;
-                            tmp_inst_R.execute_func = Executor::execute_SUB;
+                            d_cell.tmp_inst_R.name = InstName::SUB;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_SUB;
                             break;
 
                         default:
@@ -368,8 +368,8 @@ InstType Decoder::decode_inst (uint32_t inst) {
                 case 0b001:
                     switch (funct7) {
                         case 0b0000000:
-                            tmp_inst_R.name = InstName::SLL;
-                            tmp_inst_R.execute_func = Executor::execute_SLL;
+                            d_cell.tmp_inst_R.name = InstName::SLL;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_SLL;
                             break;
                         
                         default:
@@ -380,8 +380,8 @@ InstType Decoder::decode_inst (uint32_t inst) {
                 case 0b010:
                     switch (funct7) {
                         case 0b0000000:
-                            tmp_inst_R.name = InstName::SLT;
-                            tmp_inst_R.execute_func = Executor::execute_SLT;
+                            d_cell.tmp_inst_R.name = InstName::SLT;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_SLT;
                             break;
                         
                         default:
@@ -392,8 +392,8 @@ InstType Decoder::decode_inst (uint32_t inst) {
                 case 0b011:
                     switch (funct7) {
                         case 0b0000000:
-                            tmp_inst_R.name = InstName::SLTU;
-                            tmp_inst_R.execute_func = Executor::execute_SLTU;
+                            d_cell.tmp_inst_R.name = InstName::SLTU;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_SLTU;
                             break;
                         
                         default:
@@ -404,8 +404,8 @@ InstType Decoder::decode_inst (uint32_t inst) {
                 case 0b100:
                     switch (funct7) {
                         case 0b0000000:
-                            tmp_inst_R.name = InstName::XOR;
-                            tmp_inst_R.execute_func = Executor::execute_XOR;
+                            d_cell.tmp_inst_R.name = InstName::XOR;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_XOR;
                             break;
                         
                         default:
@@ -416,13 +416,13 @@ InstType Decoder::decode_inst (uint32_t inst) {
                 case 0b101:
                     switch (funct7) {
                         case 0b0000000:
-                            tmp_inst_R.name = InstName::SRL;
-                            tmp_inst_R.execute_func = Executor::execute_SRL;
+                            d_cell.tmp_inst_R.name = InstName::SRL;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_SRL;
                             break;
 
                         case 0b0100000:
-                            tmp_inst_R.name = InstName::SRA;
-                            tmp_inst_R.execute_func = Executor::execute_SRA;
+                            d_cell.tmp_inst_R.name = InstName::SRA;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_SRA;
                             break;
 
                         default:
@@ -433,8 +433,8 @@ InstType Decoder::decode_inst (uint32_t inst) {
                 case 0b110:
                     switch (funct7) {
                         case 0b0000000:
-                            tmp_inst_R.name = InstName::OR;
-                            tmp_inst_R.execute_func = Executor::execute_OR;
+                            d_cell.tmp_inst_R.name = InstName::OR;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_OR;
                             break;
 
                         default:
@@ -445,8 +445,8 @@ InstType Decoder::decode_inst (uint32_t inst) {
                 case 0b111:
                     switch (funct7) {
                         case 0b0000000:
-                            tmp_inst_R.name = InstName::AND;
-                            tmp_inst_R.execute_func = Executor::execute_AND;
+                            d_cell.tmp_inst_R.name = InstName::AND;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_AND;
                             break;
                         
                         default:
@@ -466,18 +466,18 @@ InstType Decoder::decode_inst (uint32_t inst) {
 
             switch (inst) {
                 case 0b10000011001100000000000000001111:
-                    tmp_inst_I.name = InstName::FENCE_TSO;
-                    tmp_inst_I.execute_func = Executor::execute_FENCE_TSO;
+                    d_cell.tmp_inst_I.name = InstName::FENCE_TSO;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_FENCE_TSO;
                     break;
                 
                 case 0b00000001000000000000000000001111:
-                    tmp_inst_I.name = InstName::PAUSE;
-                    tmp_inst_I.execute_func = Executor::execute_PAUSE;  
+                    d_cell.tmp_inst_I.name = InstName::PAUSE;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_PAUSE;  
                     break;        
 
                 default:
-                    tmp_inst_I.name = InstName::FENCE;
-                    tmp_inst_I.execute_func = Executor::execute_FENCE;
+                    d_cell.tmp_inst_I.name = InstName::FENCE;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_FENCE;
             }
             inst_type = InstType::I;
             break;
@@ -485,13 +485,13 @@ InstType Decoder::decode_inst (uint32_t inst) {
         case Opcode::SYSTEM:
             switch (inst) {
                 case 0b00000000000000000000000001110011:
-                    tmp_inst_I.name = InstName::ECALL;
-                    tmp_inst_I.execute_func = Executor::execute_ECALL;
+                    d_cell.tmp_inst_I.name = InstName::ECALL;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_ECALL;
                     break;
                 
                 case 0b00000000000100000000000001110011:
-                    tmp_inst_I.name = InstName::EBREAK;
-                    tmp_inst_I.execute_func = Executor::execute_EBREAK;  
+                    d_cell.tmp_inst_I.name = InstName::EBREAK;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_EBREAK;  
                     break;     
 
                 default:
@@ -503,27 +503,27 @@ InstType Decoder::decode_inst (uint32_t inst) {
         case Opcode::OP_IMM_32:
             switch (funct3) {
                 case 0b000:
-                    tmp_inst_I.name = InstName::ADDIW;
-                    tmp_inst_I.execute_func = Executor::execute_ADDIW;
+                    d_cell.tmp_inst_I.name = InstName::ADDIW;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_ADDIW;
                     break;
                 
                 case 0b001:
                     if (funct7 != 0b0000000)
                         break;
-                    tmp_inst_I.name = InstName::SLLIW;
-                    tmp_inst_I.execute_func = Executor::execute_SLLIW;
+                    d_cell.tmp_inst_I.name = InstName::SLLIW;
+                    d_cell.tmp_inst_I.execute_func = Executor::execute_SLLIW;
                     break;
                 
                 case 0b101:
                     switch (funct7) {
                         case 0b0000000:
-                            tmp_inst_I.name = InstName::SRLIW;
-                            tmp_inst_I.execute_func = Executor::execute_SRLIW;
+                            d_cell.tmp_inst_I.name = InstName::SRLIW;
+                            d_cell.tmp_inst_I.execute_func = Executor::execute_SRLIW;
                             break;
                         
                         case 0b0100000:
-                            tmp_inst_I.name = InstName::SRAIW;
-                            tmp_inst_I.execute_func = Executor::execute_SRAIW;
+                            d_cell.tmp_inst_I.name = InstName::SRAIW;
+                            d_cell.tmp_inst_I.execute_func = Executor::execute_SRAIW;
                             break;
                         
                         default:
@@ -542,13 +542,13 @@ InstType Decoder::decode_inst (uint32_t inst) {
                 case 0b000:
                     switch (funct7) {
                         case 0b0000000:
-                            tmp_inst_R.name = InstName::ADDW;
-                            tmp_inst_R.execute_func = Executor::execute_ADDW;
+                            d_cell.tmp_inst_R.name = InstName::ADDW;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_ADDW;
                             break;
                         
                         case 0b0100000:
-                            tmp_inst_R.name = InstName::SUBW;
-                            tmp_inst_R.execute_func = Executor::execute_SUBW;
+                            d_cell.tmp_inst_R.name = InstName::SUBW;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_SUBW;
                             break;
                         
                         default:
@@ -559,20 +559,20 @@ InstType Decoder::decode_inst (uint32_t inst) {
                 case 0b001:
                     if (funct7 != 0b0000000)
                         break;
-                    tmp_inst_R.name = InstName::SLLW;
-                    tmp_inst_R.execute_func = Executor::execute_SLLW;
+                    d_cell.tmp_inst_R.name = InstName::SLLW;
+                    d_cell.tmp_inst_R.execute_func = Executor::execute_SLLW;
                     break;
                 
                 case 0b101:
                     switch (funct7) {
                         case 0b0000000:
-                            tmp_inst_R.name = InstName::SRLW;
-                            tmp_inst_R.execute_func = Executor::execute_SRLW;
+                            d_cell.tmp_inst_R.name = InstName::SRLW;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_SRLW;
                             break;
                         
                         case 0b0100000:
-                            tmp_inst_R.name = InstName::SRAW;
-                            tmp_inst_R.execute_func = Executor::execute_SRAW;
+                            d_cell.tmp_inst_R.name = InstName::SRAW;
+                            d_cell.tmp_inst_R.execute_func = Executor::execute_SRAW;
                             break;
 
                         default:
@@ -592,43 +592,43 @@ InstType Decoder::decode_inst (uint32_t inst) {
 
     switch (inst_type) {
         case InstType::R:
-            tmp_inst_R.type   = InstType::R;
-            tmp_inst_R.rs2    = decode_rs2 (inst);
-            tmp_inst_R.rs1    = decode_rs1 (inst);
-            tmp_inst_R.rd     = decode_rd (inst);
+            d_cell.tmp_inst_R.type   = InstType::R;
+            d_cell.tmp_inst_R.rs2    = decode_rs2 (inst);
+            d_cell.tmp_inst_R.rs1    = decode_rs1 (inst);
+            d_cell.tmp_inst_R.rd     = decode_rd (inst);
             break;
         
         case InstType::I:
-            tmp_inst_I.type   = InstType::I;
-            tmp_inst_I.imm    = decode_imm_I (inst);
-            tmp_inst_I.rs1    = decode_rs1 (inst);
-            tmp_inst_I.rd     = decode_rd (inst);
+            d_cell.tmp_inst_I.type   = InstType::I;
+            d_cell.tmp_inst_I.imm    = decode_imm_I (inst);
+            d_cell.tmp_inst_I.rs1    = decode_rs1 (inst);
+            d_cell.tmp_inst_I.rd     = decode_rd (inst);
             break;
         
         case InstType::S:
-            tmp_inst_S.type   = InstType::S;
-            tmp_inst_S.imm    = decode_imm_S (inst);
-            tmp_inst_S.rs2    = decode_rs2 (inst);
-            tmp_inst_S.rs1    = decode_rs1 (inst);
+            d_cell.tmp_inst_S.type   = InstType::S;
+            d_cell.tmp_inst_S.imm    = decode_imm_S (inst);
+            d_cell.tmp_inst_S.rs2    = decode_rs2 (inst);
+            d_cell.tmp_inst_S.rs1    = decode_rs1 (inst);
             break;
         
         case InstType::B:
-            tmp_inst_B.type   = InstType::B;
-            tmp_inst_B.imm    = decode_imm_B (inst);
-            tmp_inst_B.rs2    = decode_rs2 (inst);
-            tmp_inst_B.rs1    = decode_rs1 (inst);
+            d_cell.tmp_inst_B.type   = InstType::B;
+            d_cell.tmp_inst_B.imm    = decode_imm_B (inst);
+            d_cell.tmp_inst_B.rs2    = decode_rs2 (inst);
+            d_cell.tmp_inst_B.rs1    = decode_rs1 (inst);
             break;
         
         case InstType::U:
-            tmp_inst_U.type   = InstType::U;
-            tmp_inst_U.imm    = decode_imm_U (inst);
-            tmp_inst_U.rd     = decode_rd (inst);
+            d_cell.tmp_inst_U.type   = InstType::U;
+            d_cell.tmp_inst_U.imm    = decode_imm_U (inst);
+            d_cell.tmp_inst_U.rd     = decode_rd (inst);
             break;
         
         case InstType::J:
-            tmp_inst_J.type   = InstType::J;
-            tmp_inst_J.imm    = decode_imm_J (inst);
-            tmp_inst_J.rd     = decode_rd (inst);
+            d_cell.tmp_inst_J.type   = InstType::J;
+            d_cell.tmp_inst_J.imm    = decode_imm_J (inst);
+            d_cell.tmp_inst_J.rd     = decode_rd (inst);
             break;
     }
 

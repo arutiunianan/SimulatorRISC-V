@@ -59,6 +59,7 @@ void Executor::execute_JAL (Inst* inst, Hart& hart) {
 
     hart.set_pc_val (target_addr);
     hart.set_reg_val (inst_J->get_rd(), inst_J->get_addr() + WORD_SIZE);
+    hart.set_flag_new_bb ();
 }
 
 void Executor::execute_JALR (Inst* inst, Hart& hart) {
@@ -77,6 +78,7 @@ void Executor::execute_JALR (Inst* inst, Hart& hart) {
 
     hart.set_pc_val (target_addr);
     hart.set_reg_val (inst_I->get_rd(), inst_I->get_addr() + WORD_SIZE);
+    hart.set_flag_new_bb ();
 }
 
 // TODO: The conditional branch instructions will generate an 
@@ -99,7 +101,9 @@ void Executor::execute_BEQ (Inst* inst, Hart& hart) {
             return;
 
         hart.set_pc_val (target_addr);
-    }     
+    }   
+
+    hart.set_flag_new_bb ();  
 }
 
 void Executor::execute_BNE (Inst* inst, Hart& hart) {
@@ -118,6 +122,8 @@ void Executor::execute_BNE (Inst* inst, Hart& hart) {
 
         hart.set_pc_val (target_addr);
     }
+
+    hart.set_flag_new_bb ();
 }
 
 void Executor::execute_BLT (Inst* inst, Hart& hart) {
@@ -136,6 +142,8 @@ void Executor::execute_BLT (Inst* inst, Hart& hart) {
 
         hart.set_pc_val (target_addr);
     }
+
+    hart.set_flag_new_bb ();
 }
 
 void Executor::execute_BGE (Inst* inst, Hart& hart) {
@@ -154,6 +162,8 @@ void Executor::execute_BGE (Inst* inst, Hart& hart) {
 
         hart.set_pc_val (target_addr);
     }
+
+    hart.set_flag_new_bb ();
 }
 
 void Executor::execute_BLTU (Inst* inst, Hart& hart) {
@@ -172,6 +182,8 @@ void Executor::execute_BLTU (Inst* inst, Hart& hart) {
 
         hart.set_pc_val (target_addr);
     }
+
+    hart.set_flag_new_bb ();
 }
 
 void Executor::execute_BGEU (Inst* inst, Hart& hart) {
@@ -190,6 +202,8 @@ void Executor::execute_BGEU (Inst* inst, Hart& hart) {
 
         hart.set_pc_val (target_addr);
     }
+
+    hart.set_flag_new_bb ();
 }
 
 void Executor::execute_LB (Inst* inst, Hart& hart) {
