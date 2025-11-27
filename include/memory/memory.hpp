@@ -19,7 +19,7 @@ public:
     Memory (int size = DEFAULT_MEM_SIZE): mem_size (size) {
         mem = new std::byte [mem_size];
     }
-    ~Memory() {
+    ~Memory () {
         delete [] mem;
     }
 
@@ -28,6 +28,6 @@ public:
 
     void mem_store (uint64_t offset, void* ptr, int ptr_size);
     void mem_load (uint64_t offset, void* ptr, int ptr_size);
-    void dump();
+    void dump ();
     void dump_stack (uint64_t sp);
 };

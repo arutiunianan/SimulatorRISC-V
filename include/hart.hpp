@@ -9,7 +9,8 @@
 
 #include "utils/constants.hpp"
 
-#include "memory.hpp"
+#include "memory/memory.hpp"
+#include "memory/mmu.hpp"
 #include "stages/decoder.hpp"
 
 //--------------------------------------------------------------------------
@@ -36,6 +37,7 @@ private:
     uint64_t start_addr;
 
     Memory memory;
+    MMU mmu;
     Regfile regfile;
     Reg pc;
     Decoder  decoder;
@@ -52,6 +54,8 @@ private:
     friend void set_nop_de_cell (Hart& hart);
 
 public:
+    Hart(): mmu(*this) {}
+
 // Function that terminates running of pipeline
     void finish () { stop = true; }
 
@@ -59,6 +63,9 @@ public:
     void map_seg_to_VAS (Segment& segment);
     inline void set_start_addr (uint64_t vaddr) { start_addr = vaddr; }
     inline void set_sp () { regfile.set_reg_val (2, DEFAULT_MEM_SIZE + start_addr); }
+    bool read_phys_u64 (uint64_t phys_addr, uint64_t &out);
+    inline void write_satp(uint64_t val) { mmu.satp.raw = val; mmu.flush_tlb(); }
+    inline uint64_t read_satp() const { return mmu.satp.raw; }
     void load_from_memory (uint64_t vaddr, void* load_ptr, int load_size);
     void store_in_memory (uint64_t vaddr, uint64_t val, int store_size);
     void memory_dump () { memory.dump (); }

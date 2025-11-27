@@ -10,7 +10,7 @@ void Hart::map_seg_to_VAS (Segment& segment) {
     uint64_t vp_alignment = (VPAGE_SIZE - vaddr % VPAGE_SIZE) % VPAGE_SIZE;
     if (vp_alignment != 0) {
         //check if the page is readable or writable
-        if (segment.get_flag() & (PF_W || PF_R)) {
+        if (segment.get_flag() & (PF_W | PF_R)) {
             return;
         }
 
@@ -18,16 +18,31 @@ void Hart::map_seg_to_VAS (Segment& segment) {
     }
 
     //copy the remaining pages
-    for (uint64_t vpage_offset = 0; vpage_offset < segment.get_size() - vp_alignment; vpage_offset += VPAGE_SIZE) {
+    for (uint64_t vpage_offset = 0; vpage_offset < segment.get_size() - vp_alignment;
+         vpage_offset += VPAGE_SIZE) {
         uint64_t paddr = vaddr + vp_alignment + vpage_offset - start_addr;
 
         //determine the size for the record
         size_t store_size = VPAGE_SIZE;
-        if ((segment.get_size() - vp_alignment - vpage_offset) < VPAGE_SIZE)
+        if ((segment.get_size() - vp_alignment - vpage_offset) < VPAGE_SIZE) {
             store_size = segment.get_size() - vp_alignment - vpage_offset;
-            
+        }
+
         memory.mem_store (paddr, (char*)segment.get_data() + vp_alignment + vpage_offset, store_size);
     }
+}
+
+bool Hart::read_phys_u64 (uint64_t phys_addr, uint64_t &out) {
+    // check physical region inside mapped memory:
+    if (phys_addr < start_addr) {
+        return false;
+    }
+    uint64_t offset = phys_addr - start_addr;
+    if ((offset + sizeof(uint64_t)) > memory.get_mem_size()) {
+        return false;
+    }
+    memory.mem_load(offset, &out, sizeof(uint64_t));
+    return true;
 }
 
 void Hart::load_from_memory (uint64_t vaddr, void* load_ptr, int load_size) {
@@ -35,8 +50,17 @@ void Hart::load_from_memory (uint64_t vaddr, void* load_ptr, int load_size) {
             (load_size == WORD_SIZE) || (load_size == DWORD_SIZE) &&
             "incorrect load size (only 1, 2, 4, 8 b)");
     assert (((vaddr % load_size) == 0) && "incorrect alignment");
-    
-    memory.mem_load (vaddr - start_addr, load_ptr, load_size);
+
+    uint64_t paddr = 0;
+    if (!mmu.translate (vaddr, paddr, AccessType::LOAD)) {
+        std::cerr << "Memory translate failed (load) VA=0x"
+                  << std::hex << vaddr << std::dec << std::endl;
+        finish ();
+        return;
+    }
+
+    uint64_t offset = paddr - start_addr;
+    memory.mem_load (offset, load_ptr, load_size);
 }
 
 void Hart::store_in_memory (uint64_t vaddr, uint64_t val, int store_size) {
@@ -44,8 +68,17 @@ void Hart::store_in_memory (uint64_t vaddr, uint64_t val, int store_size) {
             (store_size == WORD_SIZE) || (store_size == DWORD_SIZE) &&
             "incorrect load size (only 1, 2, 4, 8 b)");
     assert (((vaddr % store_size) == 0) && "incorrect alignment");
-    
-    memory.mem_store (vaddr - start_addr, &val, store_size);
+
+    uint64_t paddr = 0;
+    if (!mmu.translate (vaddr, paddr, AccessType::STORE)) {
+        std::cerr << "Memory translate failed (store) VA=0x"
+                  << std::hex << vaddr << std::dec << std::endl;
+        finish ();
+        return;
+    }
+
+    uint64_t offset = paddr - start_addr;
+    memory.mem_store (offset, &val, store_size);
 }
 
 //--------------------------------------------------------------------------
@@ -55,11 +88,17 @@ void Hart::fetch () {
     uint64_t cur_pc_val = pc.get_val();
     uint32_t cur_inst;
 
-    load_from_memory (pc.get_val(), &cur_inst, WORD_SIZE);
+    uint64_t paddr = 0;
+    if (!mmu.translate (pc.get_val(), paddr, AccessType::IFETCH)) {
+        std::cerr << "Instruction fetch translate failed PC=0x"
+                  << std::hex << pc.get_val() << std::dec << std::endl;
+        finish();
+        return;
+    }
 
+    memory.mem_load(paddr - start_addr, &cur_inst, WORD_SIZE);
     fd.inst = cur_inst;
     fd.addr = pc.get_val();
-
     pc.set_val (cur_pc_val + WORD_SIZE);
 }
 
