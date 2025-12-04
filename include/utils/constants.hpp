@@ -9,7 +9,7 @@ static const int VPAGE_SIZE        = 1 << 12;
 static const int VPAGE_OFFSET_MASK = VPAGE_SIZE - 1;
 static const int DEFAULT_MEM_SIZE  = 1 << 30;
 
-// Masks
+//--------------------FOR PTE--------------------
 static const uint64_t PTE_V_MASK = 1ull << 0;
 static const uint64_t PTE_R_MASK = 1ull << 1;
 static const uint64_t PTE_W_MASK = 1ull << 2;

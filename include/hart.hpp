@@ -54,7 +54,10 @@ private:
     friend void set_nop_de_cell (Hart& hart);
 
 public:
-    Hart(): mmu(*this) {}
+    Hart(): mmu(*this) {
+        // Setting stack pointer as the end of VAS
+        regfile.set_reg_val (2, memory.get_mem_size());
+    }
 
 // Function that terminates running of pipeline
     void finish () { stop = true; }
@@ -62,14 +65,16 @@ public:
 // Interaction with memory
     void map_seg_to_VAS (Segment& segment);
     inline void set_start_addr (uint64_t vaddr) { start_addr = vaddr; }
+    inline uint64_t get_start_addr () const { return start_addr; }
     inline void set_sp () { regfile.set_reg_val (2, DEFAULT_MEM_SIZE + start_addr); }
-    bool read_phys_u64 (uint64_t phys_addr, uint64_t &out);
+    bool read_phys_u64 (uint64_t paddr, uint64_t &out);
+    bool write_phys_u64(uint64_t paddr, uint64_t val);
     inline void write_satp(uint64_t val) { mmu.satp.raw = val; mmu.flush_tlb(); }
-    inline uint64_t read_satp() const { return mmu.satp.raw; }
-    void load_from_memory (uint64_t vaddr, void* load_ptr, int load_size);
-    void store_in_memory (uint64_t vaddr, uint64_t val, int store_size);
+    inline uint64_t read_satp () const { return mmu.satp.raw; }
+    void load_from_memory (uint64_t vaddr, void* ptr, int ptr_size, AccessType at = AccessType::LOAD);
+    void store_in_memory (uint64_t vaddr, void* ptr, int store_size);
     void memory_dump () { memory.dump (); }
-    
+
 // Interaction with regfile
     inline void set_reg_val (uint8_t reg, uint64_t v) { regfile.set_reg_val (reg, v); }
     inline uint64_t get_reg_val (uint8_t reg) { return regfile.get_reg_val (reg); }
@@ -79,5 +84,5 @@ public:
 // Main pipeline cycle
     void run_pipeline (bool trace);
 
-    void dump ();
+    void dump (std::ostream& ostr = std::cout);
 };

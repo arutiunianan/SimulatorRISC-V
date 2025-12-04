@@ -266,7 +266,7 @@ void Executor::execute_SB (Inst* inst, Hart& hart) {
 
     uint64_t effective_addr = rs1_val + imm_val;
 
-    hart.store_in_memory (effective_addr, rs2_val, BYTE_SIZE);
+    hart.store_in_memory (effective_addr, &rs2_val, BYTE_SIZE);
 }
 
 void Executor::execute_SH (Inst* inst, Hart& hart) {
@@ -278,7 +278,7 @@ void Executor::execute_SH (Inst* inst, Hart& hart) {
 
     uint64_t effective_addr = rs1_val + imm_val;
 
-    hart.store_in_memory (effective_addr, rs2_val, HWORD_SIZE);
+    hart.store_in_memory (effective_addr, &rs2_val, HWORD_SIZE);
 }
 
 void Executor::execute_SW (Inst* inst, Hart& hart) {
@@ -290,7 +290,7 @@ void Executor::execute_SW (Inst* inst, Hart& hart) {
 
     uint64_t effective_addr = rs1_val + imm_val;
 
-    hart.store_in_memory (effective_addr, rs2_val, WORD_SIZE);
+    hart.store_in_memory (effective_addr, &rs2_val, WORD_SIZE);
 }
 
 void Executor::execute_ADDI (Inst* inst, Hart& hart) {
@@ -463,31 +463,31 @@ void Executor::execute_AND (Inst* inst, Hart& hart) {
 // with a single SYSTEM hardware instruction that always traps 
 // and might be able to implement the FENCE instruction as a 
 // NOP, reducing base instruction count to 38 total.
-void Executor::execute_FENCE (Inst* inst, Hart& hart) {
+void Executor::execute_FENCE ([[maybe_unused]] Inst* inst, [[maybe_unused]] Hart& hart) {
     // NOP
     return;
 }
 
-void Executor::execute_FENCE_TSO (Inst* inst, Hart& hart) {
+void Executor::execute_FENCE_TSO ([[maybe_unused]] Inst* inst, [[maybe_unused]] Hart& hart) {
     // NOP
     return;
 }
 
 // We assume SYSTEM instructions just wait for something 
 // from keyboard.
-void Executor::execute_PAUSE (Inst* inst, Hart& hart) {
+void Executor::execute_PAUSE ([[maybe_unused]] Inst* inst, [[maybe_unused]] Hart& hart) {
     int tmp;
     std::cin >> tmp;
     return;
 }
 
-void Executor::execute_ECALL (Inst* inst, Hart& hart) {
+void Executor::execute_ECALL ([[maybe_unused]] Inst* inst, [[maybe_unused]] Hart& hart) {
     int tmp;
     std::cin >> tmp;
     return;
 }
 
-void Executor::execute_EBREAK (Inst* inst, Hart& hart) {
+void Executor::execute_EBREAK ([[maybe_unused]] Inst* inst, [[maybe_unused]] Hart& hart) {
     int tmp;
     std::cin >> tmp;
     return;
@@ -531,7 +531,7 @@ void Executor::execute_SD (Inst* inst, Hart& hart) {
 
     uint64_t effective_addr = rs1_val + imm_val;
 
-    hart.store_in_memory (effective_addr, rs2_val, DWORD_SIZE);
+    hart.store_in_memory (effective_addr, &rs2_val, DWORD_SIZE);
 }
 
 void Executor::execute_SLLI (Inst* inst, Hart& hart) {

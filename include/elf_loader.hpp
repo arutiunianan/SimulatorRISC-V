@@ -21,5 +21,3 @@ public:
     ELFLoader (std::string path): file_path (path) {}
     void load (Hart& hart);
 };
-
-

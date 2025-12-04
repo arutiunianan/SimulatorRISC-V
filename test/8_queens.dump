@@ -132,7 +132,7 @@ Disassembly of section .text:
    102d0:	fcf42a23          	sw	a5,-44(s0)
    102d4:	fd442783          	lw	a5,-44(s0)
    102d8:	0007871b          	sext.w	a4,a5
-   102dc:	01b00793          	li	a5,27
+   102dc:	01b00793          	li	a5,8
    102e0:	00f71663          	bne	a4,a5,102ec <solveNQueens+0x34>
    102e4:	00100793          	li	a5,1
    102e8:	0e80006f          	j	103d0 <solveNQueens+0x118>

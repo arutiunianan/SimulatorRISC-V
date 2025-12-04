@@ -28,6 +28,6 @@ public:
 
     void mem_store (uint64_t offset, void* ptr, int ptr_size);
     void mem_load (uint64_t offset, void* ptr, int ptr_size);
-    void dump ();
-    void dump_stack (uint64_t sp);
+    void dump (std::ostream& ostr = std::cout);
+    void dump_stack (uint64_t sp, std::ostream& ostr = std::cout);
 };

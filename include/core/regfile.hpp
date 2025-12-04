@@ -41,35 +41,37 @@ public:
     inline uint64_t get_reg_val (uint8_t reg) { return regs[reg].get_val(); }
     inline void set_reg_val (uint8_t reg, uint64_t v) { regs[reg].set_val (v); }
 
-    void dump () {
+    void dump (std::ostream& ostr = std::cout) {
         for (int i = 0; i < 32; i++) {
             uint64_t val = get_reg_val (i);
 
-            std::cout << std::dec << "x_" << std::setfill ('0') << std::setw(2) << i
-                      << " [";
+            ostr << std::dec << "x_" << std::setfill ('0') << std::setw(2) << i
+                 << " [";
 
-            if (val != 0)
-                std::cout << "\033[32m";
+            if (val != 0) {
+                ostr << "\033[32m";
+            }
 
-            std::cout << std::setw(20) << val << "\033[0m] " << "(";
+            ostr << std::setw(20) << val << "\033[0m] " << "(";
 
-            if (val != 0)
-                std::cout << "\033[32m";
+            if (val != 0) {
+                ostr << "\033[32m";
+            }
 
-            std::cout << "0x" << std::setw(16) << std::hex << val << "\033[0m)" << std::endl;
+            ostr << "0x" << std::setw(16) << std::hex << val << "\033[0m)" << std::endl;
         }
     }
 
-    void spike_type_dump () {
+    void spike_type_dump (std::ostream& ostr = std::cout) {
         for (int i = 0; i < 32; i += 4) {
             for (int j = 0; j < 4; j++) {
                 uint64_t val = get_reg_val (i+j);
 
-                std::cout << std::setw(4) << reg_names.at(i+j) << ": 0x" 
-                          << std::setw(16) << std::setfill ('0') << std::hex 
-                          << val << std::setfill (' ');
+                ostr << std::setw(4) << reg_names.at(i+j) << ": 0x" 
+                     << std::setw(16) << std::setfill ('0') << std::hex 
+                     << val << std::setfill (' ');
             }
-            std::cout << std::endl;
+            ostr << std::endl;
         }
     }
 };
