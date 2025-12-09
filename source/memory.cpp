@@ -20,15 +20,17 @@ void Memory::dump (std::ostream& ostr) {
                 ostr << std::endl << "..." << std::endl;
                 zero_counter = 0;
             }
-            else
+            else {
                 continue;
+            }
         }
 
         ostr << std::hex << std::setw (2) << std::setfill('0')
                   << static_cast<int>(mem[i]) << " ";
 
-        if (std::to_integer<int>(mem[i]) == 0)
+        if (std::to_integer<int>(mem[i]) == 0) {
             zero_counter++;
+        }
     }
     ostr << std::dec << std::endl;
 }

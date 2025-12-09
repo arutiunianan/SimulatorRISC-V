@@ -83,15 +83,6 @@ void Hart::fetch () {
 
     load_from_memory(cur_pc_val, &cur_inst, WORD_SIZE, AccessType::IFETCH);
 
-    /*
-    if (!mmu.translate (pc.get_val (), paddr, AccessType::IFETCH)) {
-        std::cerr << "Instruction fetch translate failed PC=0x"
-                  << std::hex << pc.get_val () << std::dec << std::endl;
-        finish();
-        return;
-    }
-
-    memory.mem_load (paddr, &cur_inst, WORD_SIZE);*/
     fd.inst = cur_inst;
     fd.addr = pc.get_val();
     pc.set_val (cur_pc_val + WORD_SIZE);
@@ -110,7 +101,7 @@ void Hart::decode () {
     de.inst = cur_de_inst;
 }
 
-void Hart::execute (bool trace) {
+void Hart::execute (bool trace, std::ostream& ostr) {
     Inst* cur_de_inst = de.inst;
 
     if (!cur_de_inst) {
@@ -119,8 +110,8 @@ void Hart::execute (bool trace) {
     
     // Dump regfile eachtime we enter into or return out of function
     if (trace && (cur_de_inst->name == InstName::JALR)) {
-        regfile.spike_type_dump();
-        std::cout << std::endl;
+        regfile.spike_type_dump(ostr);
+        ostr << std::endl;
     }
 
     cur_de_inst->execute_func (cur_de_inst, *this);
@@ -136,21 +127,15 @@ void Hart::run_pipeline (bool trace) {
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
-    #ifdef TEST
-        dump (std::cerr);
-    #endif
     do {
         set_reg_val (0, 0);
         
         fetch();
         decode();
-        execute (trace);
+        execute (trace, std::cerr);
 
         num_of_executed_inst++;
     } while (!stop);
-    #ifdef TEST
-        dump (std::cerr);
-    #endif
 
     const auto t_end = std::chrono::high_resolution_clock::now();
     double duration = std::chrono::duration<double>(t_end - t_start).count();

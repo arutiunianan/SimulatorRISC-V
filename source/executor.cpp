@@ -7,8 +7,9 @@
 inline uint64_t sext (uint64_t val, uint8_t size) {
     uint64_t msb = 1 << (size - 1);
 
-    if (!(val & msb))
+    if (!(val & msb)) {
         return val;
+    }
     
     uint64_t ext_mask = 1;
     for (uint8_t i = 0; i < size - 1; i++) {
@@ -54,8 +55,9 @@ void Executor::execute_JAL (Inst* inst, Hart& hart) {
     uint64_t target_addr = inst_J->get_addr() + offset;
 
     // TODO: instruction-address-misaligned exception
-    if ((target_addr % WORD_SIZE) != 0)
+    if ((target_addr % WORD_SIZE) != 0) {
         return;
+    }
 
     hart.set_pc_val (target_addr);
     hart.set_reg_val (inst_J->get_rd(), inst_J->get_addr() + WORD_SIZE);
@@ -69,11 +71,13 @@ void Executor::execute_JALR (Inst* inst, Hart& hart) {
     uint64_t target_addr = (rs1_val + offset) & ~1;
 
     // TODO: instruction-address-misaligned exception
-    if ((target_addr % WORD_SIZE) != 0)
+    if ((target_addr % WORD_SIZE) != 0) {
         return;
+    }
     
-    if (target_addr == 0)
+    if (target_addr == 0) {
         hart.finish();
+    }
 
     hart.set_pc_val (target_addr);
     hart.set_reg_val (inst_I->get_rd(), inst_I->get_addr() + WORD_SIZE);
@@ -95,8 +99,9 @@ void Executor::execute_BEQ (Inst* inst, Hart& hart) {
 
     if (rs1_val == rs2_val) {
         // TODO: instruction-address-misaligned exception
-        if ((target_addr % WORD_SIZE) != 0)
+        if ((target_addr % WORD_SIZE) != 0) {
             return;
+        }
 
         hart.set_pc_val (target_addr);
     }     
@@ -113,8 +118,9 @@ void Executor::execute_BNE (Inst* inst, Hart& hart) {
 
     if (rs1_val != rs2_val) {
         // TODO: instruction-address-misaligned exception
-        if ((target_addr % WORD_SIZE) != 0)
+        if ((target_addr % WORD_SIZE) != 0) {
             return;
+        }
 
         hart.set_pc_val (target_addr);
     }
@@ -131,8 +137,9 @@ void Executor::execute_BLT (Inst* inst, Hart& hart) {
 
     if (rs1_val < rs2_val) {
         // TODO: instruction-address-misaligned exception
-        if ((target_addr % WORD_SIZE) != 0)
+        if ((target_addr % WORD_SIZE) != 0) {
             return;
+        }
 
         hart.set_pc_val (target_addr);
     }
@@ -149,8 +156,9 @@ void Executor::execute_BGE (Inst* inst, Hart& hart) {
 
     if (rs1_val >= rs2_val) {
         // TODO: instruction-address-misaligned exception
-        if ((target_addr % WORD_SIZE) != 0)
+        if ((target_addr % WORD_SIZE) != 0) {
             return;
+        }
 
         hart.set_pc_val (target_addr);
     }
@@ -167,8 +175,9 @@ void Executor::execute_BLTU (Inst* inst, Hart& hart) {
 
     if (rs1_val < rs2_val) {
         // TODO: instruction-address-misaligned exception
-        if ((target_addr % WORD_SIZE) != 0)
+        if ((target_addr % WORD_SIZE) != 0) {
             return;
+        }
 
         hart.set_pc_val (target_addr);
     }
@@ -185,8 +194,9 @@ void Executor::execute_BGEU (Inst* inst, Hart& hart) {
 
     if (rs1_val >= rs2_val) {
         // TODO: instruction-address-misaligned exception
-        if ((target_addr % WORD_SIZE) != 0)
+        if ((target_addr % WORD_SIZE) != 0) {
             return;
+        }
 
         hart.set_pc_val (target_addr);
     }
@@ -308,11 +318,13 @@ void Executor::execute_SLTI (Inst* inst, Hart& hart) {
     int64_t imm_val = sext (inst_I->get_imm(), 12);
     int64_t rs1_val = hart.get_reg_val (inst_I->get_rs1());
 
-    if (rs1_val < imm_val)
+    if (rs1_val < imm_val) {
         hart.set_reg_val (inst_I->get_rd(), 1);
+    }
     
-    else 
+    else {
         hart.set_reg_val (inst_I->get_rd(), 0);
+    }
 }
 
 void Executor::execute_SLTIU (Inst* inst, Hart& hart) {
@@ -321,11 +333,13 @@ void Executor::execute_SLTIU (Inst* inst, Hart& hart) {
     uint64_t imm_val = sext (inst_I->get_imm(), 12);
     uint64_t rs1_val = hart.get_reg_val (inst_I->get_rs1());
 
-    if (rs1_val < imm_val)
+    if (rs1_val < imm_val) {
         hart.set_reg_val (inst_I->get_rd(), 1);
+    }
     
-    else 
+    else {
         hart.set_reg_val (inst_I->get_rd(), 0);
+    }
 }
 
 void Executor::execute_XORI (Inst* inst, Hart& hart) {
@@ -388,11 +402,13 @@ void Executor::execute_SLT (Inst* inst, Hart& hart) {
     uint64_t rs2_val = hart.get_reg_val (inst_R->get_rs2());
     uint64_t rs1_val = hart.get_reg_val (inst_R->get_rs1());
 
-    if (rs1_val < rs2_val)
+    if (rs1_val < rs2_val) {
         hart.set_reg_val (inst_R->get_rd(), 1);
+    }
     
-    else 
+    else {
         hart.set_reg_val (inst_R->get_rd(), 0);
+    }
 }
 
 void Executor::execute_SLTU (Inst* inst, Hart& hart) {
@@ -401,11 +417,13 @@ void Executor::execute_SLTU (Inst* inst, Hart& hart) {
     int64_t rs2_val = hart.get_reg_val (inst_R->get_rs2());
     int64_t rs1_val = hart.get_reg_val (inst_R->get_rs1());
 
-    if (rs1_val < rs2_val)
+    if (rs1_val < rs2_val) {
         hart.set_reg_val (inst_R->get_rd(), 1);
+    }
     
-    else 
+    else {
         hart.set_reg_val (inst_R->get_rd(), 0);
+    }
 }
 
 void Executor::execute_XOR (Inst* inst, Hart& hart) {

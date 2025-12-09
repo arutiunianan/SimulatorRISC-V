@@ -3,11 +3,11 @@
 
 void ELFLoader::load (Hart& hart) {
     assert (elf_version (EV_CURRENT) != EV_NONE && "libelf initialization failed");
-   
+
     //open the elf file
     int elf_file = open (file_path.c_str(), O_RDONLY);
     assert (elf_file != -1 && "there is no such elf-file");
-    
+
     //get the elf file size
     file_size = lseek(elf_file, 0, SEEK_END);
     lseek (elf_file, 0, SEEK_SET);
@@ -16,7 +16,7 @@ void ELFLoader::load (Hart& hart) {
     std::vector<uint8_t> elf_buf (file_size, 0);
     int read_num = read (elf_file, elf_buf.data(), file_size);
     assert (read_num != -1);
-   
+
     //get elf-file
     Elf* elf = elf_begin (elf_file, ELF_C_READ, nullptr);
     assert (gelf_getclass (elf) != ELFCLASSNONE && "fail to get elf file");

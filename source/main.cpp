@@ -8,8 +8,9 @@ int main(int argc, char** argv) {
     }
 
     bool trace = false;
-    if (argc >= 3 && !strcmp(argv[2], "-trace"))
+    if (argc >= 3 && !strcmp(argv[2], "-trace")) {
         trace = true;
+    }
 
     Hart hart;
     ELFLoader elfik (argv[1]);

@@ -47,7 +47,7 @@ private:
     fd_cell fd;
     void decode ();
     de_cell de;
-    void execute (bool trace);
+    void execute (bool trace, std::ostream& ostr = std::cout);
 
 // Auxiliary functions for inserting bubbles
     friend void set_nop_fd_cell (Hart& hart);

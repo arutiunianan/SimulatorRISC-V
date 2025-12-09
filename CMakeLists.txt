@@ -12,10 +12,6 @@ add_compile_options(
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
-if(TEST)
-    add_definitions(-DTEST)
-endif()
-
 set(SIMULATOR_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(SOURCE_DIR "${SIMULATOR_DIR}/source")
 set(INCLUDE_DIR "${SIMULATOR_DIR}/include")

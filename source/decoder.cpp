@@ -160,8 +160,9 @@ InstType Decoder::recognize_inst (uint32_t inst) {
             return InstType::J;
             
         case Opcode::JALR:
-            if (funct3 != 0b000)
+            if (funct3 != 0b000) {
                 return InstType::NONE;
+            }
             tmp_inst_I.name = InstName::JALR;
             tmp_inst_I.execute_func = Executor::execute_JALR;
             return InstType::I;
@@ -305,8 +306,9 @@ InstType Decoder::recognize_inst (uint32_t inst) {
                     break;
                 
                 case 0b001:
-                    if (funct7 >> 1 != 0b000000)
+                    if (funct7 >> 1 != 0b000000) {
                         return InstType::NONE;
+                    }
                     tmp_inst_I.name = InstName::SLLI;
                     tmp_inst_I.execute_func = Executor::execute_SLLI;
                     break;
@@ -447,8 +449,9 @@ InstType Decoder::recognize_inst (uint32_t inst) {
             return InstType::R;
 
         case Opcode::MISC_MEM:
-            if (funct3 != 0b000)
+            if (funct3 != 0b000) {
                 return InstType::NONE;
+            }
 
             switch (inst) {
                 case 0b10000011001100000000000000001111:

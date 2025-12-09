@@ -53,7 +53,7 @@ run_test() {
     
     # Запускаем вашу программу с .o файлом как аргументом
     echo -e "Выполняется: $PROGRAM $o_file"
-    "$PROGRAM" "$o_file" 2> "$tmp_output"
+    "$PROGRAM" "$o_file" -trace 2> "$tmp_output"
     local program_exit_code=$?
     
     # Проверяем код завершения вашей программы
